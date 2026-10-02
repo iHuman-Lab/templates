@@ -124,3 +124,7 @@ Change `$primary-color` and `$body-bg` to re-theme most of the deck at once. Eve
 ## Publishing
 
 To share a deck as a link, render it and host the output `.html` file (and its `_files` folder) anywhere static files can be served — GitHub Pages, the lab website's `outreach/` section, or a simple file share.
+
+## License
+
+See [LICENSE](../LICENSE) in the repository root.

@@ -77,6 +77,12 @@ $heading-font: "Rubik", sans-serif !default;
     padding-left: 16px;
 }
 
+/* reveal.js zeroes the top margin on ul/ol but not p, so a column starting
+   with a paragraph sits lower than one starting with a list — normalize it */
+.reveal .column > *:first-child {
+    margin-top: 0;
+}
+
 .reveal ul li::marker {
     color: #EC672C;
 }
@@ -328,6 +334,31 @@ $heading-font: "Rubik", sans-serif !default;
     border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
+/* Let the participant photo sit at its natural (uncropped) size, vertically
+   centered alongside the taller card stack. Quarto's own .column/.columns
+   utility classes force display:inline-block (for margin-content layout),
+   which overrides pandoc's flex-based two-column div — so columns never
+   stretch to a shared height on their own. Re-enable flex + stretch just
+   here so .center-v has a taller box to center within. */
+.reveal #research-questions-and-contribution .columns {
+    display: flex;
+    align-items: stretch;
+}
+
+/* Stretch the eye-tracking slide's table to fill the full slide width. */
+.reveal #eye-tracking-features {
+    table {
+        width: 100%;
+        font-size: 1em;
+        line-height: 1.4;
+    }
+
+    table td,
+    table th {
+        padding: 0.55em 0.8em;
+    }
+}
+
 /* Code blocks */
 .reveal pre {
     box-shadow: none;
@@ -343,6 +374,82 @@ $heading-font: "Rubik", sans-serif !default;
     font-size: 1.25em;
     line-height: 1.5;
     max-height: none;
+}
+
+/* Add .center-v to a ::: {.column} to vertically center its content
+   alongside a taller sibling column */
+.reveal .column.center-v {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* LLM message — ::: {.llm-message}, a full prompt shown as a wide rounded
+   callout box (cream/tan), distinct from the orange-accented cards elsewhere */
+.llm-message {
+    background: #F1E4B8;
+    border: 1px solid #D8C48A;
+    border-radius: 14px;
+    padding: 0.9rem 1.3rem;
+    margin: 0.4rem 0 1rem 0;
+    width: 100%;
+}
+
+.llm-message p {
+    color: #2a2a2a !important;
+    font-size: 0.9em;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.llm-message p:last-child {
+    margin-bottom: 0;
+}
+
+/* Fit the full prompt, implementation notes, and cards on one slide. */
+.reveal .prompt-slide {
+    h2 { margin-bottom: 12px; }
+
+    .llm-message {
+        box-sizing: border-box;
+        padding: 14px 18px;
+        margin: 8px 0 12px;
+    }
+
+    .llm-message p {
+        font-size: 20px;
+        line-height: 1.35;
+    }
+
+    > ul {
+        font-size: 20px;
+        margin: 0 0 10px 24px;
+    }
+
+    > ul > li {
+        line-height: 1.3;
+        margin: 5px 0;
+    }
+
+    .cards {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 10px;
+    }
+
+    .card {
+        padding: 10px 14px;
+    }
+
+    .card p {
+        font-size: 18px;
+        line-height: 1.35;
+    }
+
+    .card-title {
+        font-size: 18px;
+        margin-bottom: 5px;
+    }
 }
 
 /* Flow diagram */
@@ -421,6 +528,11 @@ $heading-font: "Rubik", sans-serif !default;
     margin-right: auto;
 }
 
+/* Add .grid-2 to force a fixed 2-column grid instead of auto-fit: ::: {.cards .grid-2} */
+.cards.grid-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .card {
     border-left: 3px solid $primary-color;
     background: $gray-light;
@@ -441,14 +553,14 @@ $heading-font: "Rubik", sans-serif !default;
     display: block;
     font-weight: 700;
     color: $primary-color;
-    font-size: 0.85em;
+    font-size: 0.9em;
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 0.2rem;
 }
 
 .card p {
-    font-size: 0.72em;
+    font-size: 0.9em;
     color: #333333;
     line-height: 1.4;
     margin: 0;
@@ -477,6 +589,11 @@ $heading-font: "Rubik", sans-serif !default;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 1rem 2rem;
     margin-top: 1.2rem;
+}
+
+/* Add .grid-2 to force a fixed 2-column grid instead of auto-fit: ::: {.stats .grid-2} */
+.stats.grid-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .stat {
@@ -508,6 +625,55 @@ $heading-font: "Rubik", sans-serif !default;
     text-transform: uppercase;
     letter-spacing: 1.5px;
     margin-top: 0.2rem;
+}
+
+/* Metric grid — ::: {.metric-grid} containing ::: {.metric} fenced divs, each with
+   a [value]{.value}, [label]{.label}, and optional [detail]{.detail} line */
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.metric {
+    background: $gray-light;
+    border-left: 3px solid $primary-color;
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+}
+
+/* Add .secondary to de-emphasize a metric or group it as an alternate category: ::: {.metric .secondary} */
+.metric.secondary {
+    border-left-color: $secondary-color;
+}
+
+.metric.secondary .value {
+    color: $secondary-color !important;
+}
+
+.value {
+    display: block;
+    font-size: 2.8rem;
+    font-weight: 900;
+    color: $primary-color;
+    line-height: 1;
+}
+
+.label {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #222222;
+    margin-top: 0.5rem;
+}
+
+.detail {
+    display: block;
+    font-size: 1.05rem;
+    color: #555555;
+    line-height: 1.4;
+    margin-top: 0.35rem;
 }
 
 /* Quote — ::: {.quote} with a [name]{.quote-attribution} line */
